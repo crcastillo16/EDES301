@@ -4,7 +4,7 @@
 Simple Calculator
 --------------------------------------------------------------------------
 License:   
-Copyright 2026 - <NAME>
+Copyright 2026 - Cristian Castillo
 
 Redistribution and use in source and binary forms, with or without 
 modification, are permitted provided that the following conditions are met:
@@ -55,6 +55,16 @@ Error conditions:
 # NOTE - Add import statements to allow access to Python library functions
 # NOTE - Hint:  Look at  https://docs.python.org/3/library/operator.html
 
+from __future__ import print_function
+from __future__ import division
+
+import operator
+
+try:
+    input = raw_input
+except NameError:
+    pass
+
 # ------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------
@@ -68,6 +78,14 @@ Error conditions:
 # NOTE - Global variable to map an operator string (e.g. "+") to 
 # NOTE - the appropriate function.
 operators = {
+    "+" : operator.add,
+    "-" : operator.sub,
+    "*" : operator.mul,
+    "/" : operator.truediv,
+    ">>" : operator.rshift,
+    "<<" : operator.lshift,
+    "%" : operator.mod,
+    "**" : operator.pow,
     # Dictionary syntax:  "key" : "value"
     #   i.e. "function" : operator.<function>
 }
@@ -78,6 +96,12 @@ operators = {
 # Functions
 # ------------------------------------------------------------------------
 
+def parse_number(text):
+    try:
+        return int(text)
+    except ValueError:
+        return float(text) #raises ValueError if its not a number at all
+
 def get_user_input():
     """ Get input from the user.
         Returns tuple:  (number, number, function) or 
@@ -85,9 +109,13 @@ def get_user_input():
     """
     # NOTE - Use "try"/"except" statements to allow code to handle errors gracefully.      
     try:
+        number1 = parse_number(input("Enter first number : ").strip())
+        op      = input("Enter operator      : ").strip()
+        number2 = parse_number(input("Enter second number :").strip())
         # NOTE - Use "pass" statements to allow code to be run without having to 
         # NOTE - fill out the contents.  This pass statement should be removed    
-        pass
+        func = operators[op]
+        return (number1, number2, func)
         
         # NOTE - User input is generally returned as a string and must be translated.
     except:
@@ -121,5 +149,16 @@ if __name__ == "__main__":
 
     # NOTE - Use "pass" statements to allow code to be run without having to 
     # NOTE - fill out the contents.  This pass statement should be removed    
-    pass
+    while True:
+        (number1, number2, func) = get_user_input()
+        
+        if number1 is None or number2 is None or func is None:
+            break       #invalid input: exit
+        try:
+            result = func(number1, number2)
+            print("Result = {0}".format(result))
+        except ZeroDivisionError:
+            print("Error: division or modulo by zero")
+        except (TypeError, ValueError) as err:
+            print("Error: {0}".format(err))
 
